@@ -4,7 +4,7 @@
 
 html { scroll-behavior: smooth; }
 
-body { @apply bg-white text-black font-body antialiased; }
+body { @apply bg-white text-black font-body antialiased overflow-x-hidden; }
 
 ::selection { @apply bg-base-white text-base-black; }
 

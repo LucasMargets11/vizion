@@ -16,7 +16,7 @@ export default function StripeCTA() {
         aria-hidden="true"
       >
         <svg
-          className="w-[120%] h-full translate-x-[-10%]"
+          className="w-full h-full"
           viewBox="0 0 1000 100"
           preserveAspectRatio="none"
           role="presentation"
