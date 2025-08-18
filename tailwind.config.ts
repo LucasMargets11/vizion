@@ -23,22 +23,21 @@ export default {
     extend: {
       colors: {
         base: {
-          900: '#0B0E13'
+          black: '#0A0A0A',
+          white: '#FFFFFF'
         },
         brand: {
-          DEFAULT: '#00D4FF'
-        },
-        accent: {
-          DEFAULT: '#FF6B3D'
+          blue: '#5A83FF',
+          mint: '#00DC9F',
+          primary: '#5A83FF',
+          secondary: '#00DC9F'
         }
       },
       fontFamily: {
-        outfit: ['"Outfit"', 'sans-serif'],
-        inter: ['"Inter"', 'sans-serif']
+        headings: ['"Outfit"', 'sans-serif'],
+        body: ['"Inter"', 'sans-serif']
       },
-      backdropBlur: {
-        xs: '2px'
-      }
+      backdropBlur: { xs: '2px' }
     }
   },
   plugins: [forms]

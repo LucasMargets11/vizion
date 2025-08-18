@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navbar } from '@/components/nav/Navbar';
 import { Hero } from '@/components/hero/Hero';
-import { Services } from '@/components/features/Services';
+import ServicesSection from '@/components/services/Services';
 import ReelShowcase from '@/components/work/ReelShowcase';
 import { About } from '@/components/about/About';
-import { CTA } from '@/components/cta/CTA';
+import StripeCTA from '@/components/cta/StripeCTA';
 import { ContactForm } from '@/components/contact/ContactForm';
 import { MapEmbed } from '@/components/contact/MapEmbed';
 import { Footer } from '@/components/footer/Footer';
@@ -16,31 +16,36 @@ import { SEO } from '@/components/SEO';
 const Home: React.FC = () => {
   return (
     <>
-      <SEO title="Lumiax | Agencia Audiovisual" description="Agencia audiovisual obsesionada con las buenas historias." />
+      <SEO title="Vizion | Agencia Audiovisual" description="Agencia audiovisual obsesionada con las buenas historias." />
       <Navbar />
-      <main>
+      <main className="w-full">
         <Hero />
-        <LogoCloud />
-        <Services />
-        <ReelShowcase />
-        <About />
-        <CTA />
-        <Section id="contacto">
-          <div className="grid gap-12 md:grid-cols-2">
-            <div>
-              <Heading level={2}>Contacto</Heading>
-              <p className="mt-4 text-slate-300 text-sm max-w-md">Contanos de tu proyecto y volvemos a la velocidad de la luz.</p>
-              <div className="mt-8">
-                <ContactForm />
+        {/* Contenedor blanco continuo para evitar bandas negras entre bloques */}
+        <div className="bg-white text-black">
+          <div className="space-y-40 md:space-y-48">
+            <ReelShowcase />
+            <About />
+            <ServicesSection />
+            <StripeCTA />
+            <Section id="contacto" variant="light" className="px-0 !py-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 w-full py-20 md:py-28">
+                <div className="px-6 md:px-12 lg:px-20 py-4">
+                  <Heading level={2} className="text-5xl md:text-7xl font-extrabold tracking-tight w-full">Contacto</Heading>
+                  <p className="mt-6 text-base-black/70 text-lg max-w-none">Contanos de tu proyecto y volvemos a la velocidad de la luz.</p>
+                  <div className="mt-10">
+                    <ContactForm />
+                  </div>
+                </div>
+                <div className="w-full h-full flex items-stretch">
+                  <MapEmbed />
+                </div>
               </div>
-            </div>
-            <div className="space-y-6">
-              <MapEmbed />
-            </div>
+            </Section>
           </div>
-        </Section>
+          <Footer />
+        </div>
       </main>
-      <Footer />
+      
     </>
   );
 };

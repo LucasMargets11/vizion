@@ -36,17 +36,17 @@ export const ContactForm: React.FC = () => {
       <div>
         <label className="mb-2 block text-sm font-medium">Nombre</label>
         <Input value={form.nombre} onChange={(e) => update('nombre', e.target.value)} aria-invalid={!!errors.nombre} />
-        {errors.nombre && <p className="mt-1 text-xs text-accent">{errors.nombre}</p>}
+  {errors.nombre && <p className="mt-1 text-xs text-base-white/70">{errors.nombre}</p>}
       </div>
       <div>
         <label className="mb-2 block text-sm font-medium">Email</label>
         <Input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} aria-invalid={!!errors.email} />
-        {errors.email && <p className="mt-1 text-xs text-accent">{errors.email}</p>}
+  {errors.email && <p className="mt-1 text-xs text-base-white/70">{errors.email}</p>}
       </div>
       <div>
         <label className="mb-2 block text-sm font-medium">Servicio de interés</label>
         <select
-          className="w-full rounded-md bg-white/5 border border-white/10 px-4 py-2 text-sm focus:border-brand focus:ring-2 focus:ring-brand"
+          className="w-full rounded-md bg-base-white/5 border border-base-white/20 px-4 py-2 text-sm text-base-white focus:border-base-white/60 focus:ring-2 focus:ring-base-white/60"
           value={form.servicio}
           onChange={(e) => update('servicio', e.target.value)}
         >
@@ -62,7 +62,7 @@ export const ContactForm: React.FC = () => {
       <div>
         <label className="mb-2 block text-sm font-medium">Mensaje</label>
         <Textarea value={form.mensaje} onChange={(e) => update('mensaje', e.target.value)} aria-invalid={!!errors.mensaje} />
-        {errors.mensaje && <p className="mt-1 text-xs text-accent">{errors.mensaje}</p>}
+  {errors.mensaje && <p className="mt-1 text-xs text-base-white/70">{errors.mensaje}</p>}
       </div>
       <div className="flex flex-col sm:flex-row gap-4">
         <Button type="submit" variant="primary">Enviar</Button>

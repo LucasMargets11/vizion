@@ -13,15 +13,20 @@ const services: Service[] = [
 ];
 
 export const Services: React.FC = () => (
-  <Section id="servicios">
-    <div className="space-y-12">
-      <Heading level={2}>Servicios</Heading>
-      <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+  <Section id="servicios" variant="light" className="px-0">
+    <div className="w-full px-6 md:px-12 lg:px-20 space-y-12">
+      <Heading level={2} className="text-5xl md:text-7xl font-extrabold tracking-tight w-full">Servicios</Heading>
+      <ul className="grid gap-px bg-black sm:grid-cols-2 lg:grid-cols-3">
         {services.map((s) => (
-          <li key={s.title} className="group rounded-xl p-6 bg-white/5 border border-white/5 hover:bg-white/10 transition relative overflow-hidden">
-            <div className="text-3xl mb-4" aria-hidden>{s.icon}</div>
-            <h3 className="font-semibold text-lg mb-2 font-outfit">{s.title}</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">{s.desc}</p>
+          <li key={s.title} className="group relative bg-white text-black p-8 flex flex-col justify-start hover:bg-black hover:text-white transition-colors overflow-hidden">
+            <span className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-brand-blue to-brand-mint opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="text-3xl mb-6" aria-hidden>{s.icon}</div>
+            <h3 className="font-semibold text-xl mb-3 font-outfit tracking-tight">
+              <span className="bg-gradient-to-r from-brand-blue to-brand-mint bg-clip-text text-transparent group-hover:from-brand-blue/90 group-hover:to-brand-mint/90 transition-colors">
+                {s.title}
+              </span>
+            </h3>
+            <p className="text-sm leading-relaxed text-black/70 group-hover:text-white/70">{s.desc}</p>
           </li>
         ))}
       </ul>

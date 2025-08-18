@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import React from 'react';
-import { Container } from './Container';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -11,7 +10,7 @@ interface SectionProps {
   id?: string;
   className?: string;
   as?: any;
-  contained?: boolean;
+  variant?: 'dark' | 'light';
 }
 
 export const Section: React.FC<React.PropsWithChildren<SectionProps>> = ({
@@ -19,16 +18,17 @@ export const Section: React.FC<React.PropsWithChildren<SectionProps>> = ({
   className,
   as: Comp = 'section',
   children,
-  contained = true
+  variant = 'dark'
 }) => {
   const content = (
     <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }}>
       {children}
     </motion.div>
   );
+  const variantClasses = variant === 'dark' ? 'bg-black text-white' : 'bg-white text-black';
   return (
-    <Comp id={id} className={className}>
-      {contained ? <Container className="py-20 sm:py-28">{content}</Container> : content}
+    <Comp id={id} className={`w-full ${variantClasses} py-20 md:py-28 ${className || ''}`}>
+      {content}
     </Comp>
   );
 };
