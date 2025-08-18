@@ -5,6 +5,7 @@ import ServicesSection from '@/components/services/Services';
 import ReelShowcase from '@/components/work/ReelShowcase';
 import { About } from '@/components/about/About';
 import StripeCTA from '@/components/cta/StripeCTA';
+import ProcessRoadmap from '../components/process/ProcessRoadmap';
 import { ContactForm } from '@/components/contact/ContactForm';
 import { MapEmbed } from '@/components/contact/MapEmbed';
 import { Footer } from '@/components/footer/Footer';
@@ -26,6 +27,7 @@ const Home: React.FC = () => {
             <ReelShowcase />
             <About />
             <ServicesSection />
+            <ProcessRoadmap />
             <StripeCTA />
             <Section id="contacto" variant="light" className="px-0 !py-0">
               <div className="grid grid-cols-1 md:grid-cols-2 w-full py-20 md:py-28">
