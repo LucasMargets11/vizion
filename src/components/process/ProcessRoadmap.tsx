@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useReducedMotion } from 'framer-motion';
 import ProcessStep from './ProcessStep';
 import { STEPS } from './data';
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.03 } },
 };
 
-// Paleta base para degradés (pueden venir del theme si querés)
+// Paleta base para degradés (podés moverla a tu theme)
 const STEP_COLORS = [
   '#ef4444', // rojo
   '#f97316', // naranja
@@ -21,17 +21,22 @@ const STEP_COLORS = [
 
 export default function ProcessRoadmap() {
   const [active, setActive] = useState(STEPS[0].id);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const isDesktop = useMediaQuery('(min-width: 768px)');
+  const reduce = useReducedMotion();
 
-  // Índice activo y proporción para glow/progreso
+  // Índice activo (por scroll)
   const activeIndex = useMemo(
     () => Math.max(0, STEPS.findIndex((s) => s.id === active)),
     [active]
   );
-  const progressPct = ((activeIndex + 1) / STEPS.length) * 100;
 
-  // Gradientes calculados
-  const H_GRADIENT = useMemo(
+  // Si hay hover (en desktop), tiene prioridad visual sobre el activo
+  const progressIndex = isDesktop && hoverIndex !== null ? hoverIndex : activeIndex;
+  const progressPct = ((progressIndex + 1) / STEPS.length) * 100;
+
+  // Gradientes base (h/v)
+  const H_GRADIENT_BASE = useMemo(
     () => `linear-gradient(90deg, ${STEP_COLORS.join(',')})`,
     []
   );
@@ -40,9 +45,35 @@ export default function ProcessRoadmap() {
     []
   );
 
+  // Gradiente dinámico hasta el paso (mezcla color actual con el siguiente)
+  const dynamicGradient = useMemo(() => {
+    const idx = progressIndex;
+    const nextIdx = Math.min(idx + 1, STEP_COLORS.length - 1);
+    // Colores desde el primero hasta el actual…
+    const base = STEP_COLORS.slice(0, idx + 1);
+    // …y añadimos el siguiente al final para el blend
+    const withBlendTail = [...base, STEP_COLORS[nextIdx]];
+    return `linear-gradient(90deg, ${withBlendTail.join(',')})`;
+  }, [progressIndex]);
+
+  // Timings armonizados
+  const DURATION = reduce ? 0.2 : 0.55;
+  const GLOW_DURATION = reduce ? 0.15 : 0.6;
+  const EASE = 'easeOut';
+
   return (
-    <section id="proceso" className="w-full bg-white text-black py-20 md:py-28 relative overflow-hidden">
-      {/* Fondo sutil para dar profundidad (B/N muy bajo) */}
+    <section
+      id="proceso"
+      className="w-full bg-white text-black py-20 md:py-28 relative overflow-hidden"
+      style={
+        {
+          // @ts-ignore CSS vars para tunear sin tocar JS
+          '--railBlur': reduce ? '0px' : '12px',
+          '--railOpacity': reduce ? 0.22 : 0.4,
+        } as React.CSSProperties
+      }
+    >
+      {/* Fondo sutil para profundidad */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.035]"
         style={{
@@ -52,6 +83,7 @@ export default function ProcessRoadmap() {
         aria-hidden="true"
       />
 
+      {/* Keyframes locales */}
       <style>{`
         @keyframes slideGradientH {
           0% { background-position: 0% 50%; }
@@ -61,6 +93,9 @@ export default function ProcessRoadmap() {
           0% { background-position: 50% 0%; }
           100% { background-position: 50% 100%; }
         }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-rail, .animate-rail-v { animation: none !important; }
+        }
       `}</style>
 
       <div className="px-6 md:px-12 relative z-[1]">
@@ -68,48 +103,52 @@ export default function ProcessRoadmap() {
           Cómo iluminamos una historia
         </h3>
 
-        {/* DESKTOP: rail horizontal con degradé + progreso + glow dinámico */}
+        {/* DESKTOP: rail horizontal */}
         <div className="mt-10 hidden md:block relative">
           {/* Base rail tenue */}
           <div className="absolute left-0 right-0 top-5 h-[2px] bg-black/10 rounded-full" />
 
-          {/* Degradé animado (sutil) recorriendo el rail */}
-          <div
-            className="absolute left-0 right-0 top-5 h-[2px] rounded-full mix-blend-normal"
-            style={{
-              background: H_GRADIENT,
-              backgroundSize: '200% 100%',
-              animation: 'slideGradientH 18s linear infinite',
-              opacity: 0.4,
-            }}
-            aria-hidden="true"
-          />
+          {/* Degradé animado sutil recorriendo el rail (decorativo) */}
+          {!reduce && (
+            <div
+              className="absolute left-0 right-0 top-5 h-[2px] rounded-full mix-blend-normal animate-rail"
+              style={{
+                background: H_GRADIENT_BASE,
+                backgroundSize: '200% 100%',
+                animation: 'slideGradientH 18s linear infinite',
+                opacity: Number((({} as any)['--railOpacity']) ?? 0.4),
+              }}
+              aria-hidden="true"
+            />
+          )}
 
-          {/* Progreso hasta el paso activo con degradé sólido */}
+          {/* Progreso hasta el paso (hover o activo) con gradiente dinámico */}
           <motion.div
             className="absolute left-0 top-5 h-[3px] rounded-full shadow-[0_0_18px_rgba(0,0,0,0.08)]"
-            style={{ background: H_GRADIENT }}
+            style={{ background: dynamicGradient }}
             initial={{ width: 0 }}
             animate={{ width: `${progressPct}%` }}
-            transition={{ ease: 'easeOut', duration: 0.6 }}
+            transition={{ ease: EASE, duration: DURATION }}
             aria-hidden="true"
           />
 
-          {/* Glow focal siguiendo el paso activo */}
-          <motion.div
-            key={active}
-            className="pointer-events-none absolute left-0 right-0 top-0 h-14"
-            initial={{ opacity: 0, filter: 'blur(12px)' }}
-            animate={{
-              opacity: 1,
-              filter: 'blur(0px)',
-              background: `radial-gradient(ellipse 280px 46px at ${((activeIndex + 0.5) / STEPS.length) * 100}% 28px, ${
-                STEP_COLORS[activeIndex % STEP_COLORS.length]
-              }33 0%, transparent 72%)`,
-            }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            aria-hidden="true"
-          />
+          {/* Glow focal siguiendo el paso activo (no en reduce-motion) */}
+          {!reduce && (
+            <motion.div
+              key={active}
+              className="pointer-events-none absolute left-0 right-0 top-0 h-14"
+              initial={{ opacity: 0, filter: 'blur(var(--railBlur))' }}
+              animate={{
+                opacity: 1,
+                filter: 'blur(0px)',
+                background: `radial-gradient(ellipse 280px 46px at ${((activeIndex + 0.5) / STEPS.length) * 100}% 28px, ${
+                  STEP_COLORS[activeIndex % STEP_COLORS.length]
+                }33 0%, transparent 72%)`,
+              }}
+              transition={{ duration: GLOW_DURATION, ease: EASE }}
+              aria-hidden="true"
+            />
+          )}
 
           <motion.div
             variants={containerVariants}
@@ -120,43 +159,50 @@ export default function ProcessRoadmap() {
             style={{ gridTemplateColumns: `repeat(${STEPS.length}, minmax(0, 1fr))` }}
           >
             {STEPS.map((s, idx) => (
-              <StepInViewActivator
+              <div
                 key={s.id}
-                id={s.id}
-                onActivate={() => setActive(s.id)}
-                active={active === s.id}
-                horizontal
-                disabled={!isDesktop}
+                onMouseEnter={() => isDesktop && setHoverIndex(idx)}
+                onMouseLeave={() => isDesktop && setHoverIndex(null)}
               >
-                <ProcessStep
-                  title={s.title}
-                  desc={s.desc}
-                  active={active === s.id}
+                <StepInViewActivator
+                  id={s.id}
                   onActivate={() => setActive(s.id)}
-                  color={STEP_COLORS[idx % STEP_COLORS.length]}
-                  nextColor={STEP_COLORS[(idx + 1) % STEP_COLORS.length]}
-                />
-              </StepInViewActivator>
+                  active={active === s.id}
+                  horizontal
+                  disabled={!isDesktop}
+                >
+                  <ProcessStep
+                    title={s.title}
+                    desc={s.desc}
+                    active={active === s.id}
+                    onActivate={() => setActive(s.id)}
+                    color={STEP_COLORS[idx % STEP_COLORS.length]}
+                    nextColor={STEP_COLORS[(idx + 1) % STEP_COLORS.length]}
+                  />
+                </StepInViewActivator>
+              </div>
             ))}
           </motion.div>
         </div>
 
-        {/* MOBILE: rail vertical con degradé animado muy suave */}
+        {/* MOBILE: rail vertical (sin hover) */}
         <div className="mt-10 md:hidden relative pl-6 flex flex-col gap-10 snap-y snap-mandatory">
           {/* Rail base */}
           <div className="absolute left-3 top-0 bottom-0 w-[2px] bg-black/10 rounded-full" />
 
           {/* Degradé vertical animado muy sutil */}
-          <div
-            className="absolute left-3 top-0 bottom-0 w-[2px] rounded-full"
-            style={{
-              background: V_GRADIENT,
-              backgroundSize: '100% 220%',
-              animation: 'slideGradientV 22s linear infinite',
-              opacity: 0.35,
-            }}
-            aria-hidden="true"
-          />
+          {!reduce && (
+            <div
+              className="absolute left-3 top-0 bottom-0 w-[2px] rounded-full animate-rail-v"
+              style={{
+                background: V_GRADIENT,
+                backgroundSize: '100% 220%',
+                animation: 'slideGradientV 22s linear infinite',
+                opacity: Number((({} as any)['--railOpacity']) ?? 0.35),
+              }}
+              aria-hidden="true"
+            />
+          )}
 
           {STEPS.map((s, idx) => (
             <StepInViewActivator
@@ -198,10 +244,16 @@ function StepInViewActivator({
   id: string;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const inView = useInView(ref, { amount: horizontal ? 0.4 : 0.6 });
+
+  // Umbral distinto desktop/mobile para estabilidad + rootMargin para evitar "flaps"
+  const inView = useInView(ref, {
+    amount: horizontal ? 0.45 : 0.6,
+    margin: horizontal ? '-10% 0px -25% 0px' : '-12% 0px -18% 0px',
+  });
 
   useEffect(() => {
-    if (!disabled && inView) onActivate();
+    if (disabled) return;
+    if (inView && !active) onActivate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, disabled]);
 
