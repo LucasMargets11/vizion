@@ -46,6 +46,7 @@ const ReelShowcase: React.FC = () => {
   const showState = ready && inView ? 'visible' : 'hidden';
 
   return (
+    
     <section id="trabajos" className="w-full bg-white text-black py-16 md:py-24">
       <div className="w-full text-center px-6 md:px-12 lg:px-20">
         <h2 className="mx-auto max-w-none text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight">
