@@ -3,22 +3,21 @@ import { motion, useInView, useReducedMotion, AnimatePresence } from 'framer-mot
 import { usePreloadImages } from './usePreloadImages';
 import ReelCard from './ReelCard';
 import ReelFilter, { FilterDef } from './ReelFilter';
+import { WORKS } from '@/data/works';
+import { Link } from 'react-router-dom';
 
-export type Work = { id: number; title: string; description?: string; thumbnail: string; categories: string[] };
+export type Work = { id: number; slug: string; title: string; description?: string; thumbnail: string; categories: string[] };
 
 // Usamos imágenes de ejemplo existentes (thumb1-3) ciclando mientras se agregan assets reales
-const PUBLIC_THUMB = '/frente.jpg'; // imagen en carpeta public
-const works: Work[] = [
-  { id: 1, title: 'Spot Publicitario', description: 'TV / Redes', thumbnail: PUBLIC_THUMB, categories: ['audiovisual'] },
-  { id: 2, title: 'Reel Corporativo', description: 'Presentación', thumbnail: PUBLIC_THUMB, categories: ['audiovisual','branding'] },
-  { id: 3, title: 'Evento Streaming', description: 'En vivo', thumbnail: PUBLIC_THUMB, categories: ['audiovisual'] },
-  { id: 4, title: 'Brand Story', description: 'Narrativa', thumbnail: PUBLIC_THUMB, categories: ['branding','audiovisual'] },
-  { id: 5, title: 'Testimonial Cliente', description: 'Historias reales', thumbnail: PUBLIC_THUMB, categories: ['audiovisual'] },
-  { id: 6, title: 'Identidad Motion', description: 'Sistema gráfico', thumbnail: PUBLIC_THUMB, categories: ['branding'] },
-  { id: 7, title: 'Lanzamiento Producto', description: 'Impacto', thumbnail: PUBLIC_THUMB, categories: ['audiovisual'] },
-  { id: 8, title: 'Documental Corto', description: 'Historia', thumbnail: PUBLIC_THUMB, categories: ['audiovisual'] },
-  { id: 9, title: 'Anuncio Social Ads', description: 'Performance', thumbnail: PUBLIC_THUMB, categories: ['audiovisual','branding'] }
-];
+// Usamos la fuente centralizada WORKS (puede ampliarse luego)
+const works: Work[] = WORKS.map(w => ({
+  id: w.id,
+  slug: w.slug,
+  title: w.title,
+  description: w.description,
+  thumbnail: w.thumbnail,
+  categories: w.categories
+}));
 
 export const FILTERS: FilterDef[] = [
   { key: 'all', label: 'TODO' },
@@ -32,7 +31,8 @@ const ReelShowcase: React.FC = () => {
   const { ready } = usePreloadImages(urls);
   const prefersReduced = useReducedMotion();
   const ref = useRef<HTMLElement | null>(null);
-  const inView = useInView(ref, { amount: 0.25, once: true });
+  // Disparamos la animación antes con umbral bajo
+  const inView = useInView(ref, { amount: 0.1, once: true });
 
   const container = {
     hidden: { opacity: 1 },
@@ -64,13 +64,14 @@ const ReelShowcase: React.FC = () => {
       >
         <AnimatePresence mode="popLayout" initial={false}>
           {filtered.map(w => (
-            <ReelCard
-              key={w.id + filterKey}
-              title={w.title}
-              description={w.description}
-              thumbnail={w.thumbnail}
-              variants={item}
-            />
+            <Link key={w.id + filterKey} to={`/trabajos/${w.slug}`} className="block">
+              <ReelCard
+                title={w.title}
+                description={w.description}
+                thumbnail={w.thumbnail}
+                variants={item}
+              />
+            </Link>
           ))}
         </AnimatePresence>
       </motion.div>

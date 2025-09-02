@@ -24,8 +24,8 @@ const Home: React.FC = () => {
         {/* Contenedor blanco continuo para evitar bandas negras entre bloques */}
         <div className="bg-white text-black">
           <div className="space-y-40 md:space-y-48">
-            <ReelShowcase />
             <About />
+            <ReelShowcase />
             <ServicesSection />
             <ProcessRoadmap />
             <StripeCTA />

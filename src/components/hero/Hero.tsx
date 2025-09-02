@@ -50,9 +50,9 @@ export const Hero: React.FC = () => {
     {/* Flecha anclada al fondo absoluto del hero */}
     <div className="absolute left-0 right-0 bottom-6 md:bottom-8 flex justify-center pointer-events-none select-none">
       <a
-        href="#trabajos"
+        href={routes.equipo}
         className="pointer-events-auto inline-flex flex-col items-center text-white/70 hover:text-white focus-ring group"
-        aria-label="Bajar al contenido"
+        aria-label="Ir a Quiénes somos"
       >
         <svg
           className="w-8 h-8 animate-bounce transition-colors"

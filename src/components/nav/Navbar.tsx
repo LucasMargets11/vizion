@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { routes } from '@/app/routes';
 import clsx from 'clsx';
 import { MobileMenu } from './MobileMenu';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const links = [
   { href: routes.servicios, label: 'Servicios' },
@@ -12,6 +14,8 @@ const links = [
 
 export const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const isPortfolio = location.pathname.startsWith('/trabajos');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -23,14 +27,16 @@ export const Navbar: React.FC = () => {
     <header
       className={clsx(
         'fixed inset-x-0 top-0 z-50 transition-all',
-        scrolled ? 'bg-base-black/90 backdrop-blur-sm ring-1 ring-base-white/10' : 'bg-transparent'
+        (scrolled || isPortfolio)
+          ? 'bg-base-black backdrop-blur-sm ring-1 ring-base-white/10'
+          : 'bg-transparent'
       )}
       role="banner"
     >
       <nav className="container flex items-center justify-between py-4" aria-label="Principal">
-  <a href="#top" className="font-outfit text-xl font-bold tracking-tight text-base-white">
-    Vizi<span className="text-gradient-brand">o</span>n
-  </a>
+        <Link to="/" className="font-outfit text-xl font-bold tracking-tight text-base-white focus-ring px-1 py-1 rounded">
+          Vizi<span className="text-gradient-brand">o</span>n
+        </Link>
         <ul className="hidden md:flex items-center gap-8 text-sm">
           {links.map((l) => (
             <li key={l.href}>
