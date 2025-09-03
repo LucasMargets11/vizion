@@ -1,11 +1,12 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { findWorkBySlug, WORKS } from '@/data/works';
-import { Navbar } from '@/components/nav/Navbar';
-import { Footer } from '@/components/footer/Footer';
-import { useHeaderOffset } from '@/hooks/useHeaderOffset';
-import GradientHero from '@/components/hero/GradientHero';
+import { Link, useParams } from 'react-router-dom';
+
 import { routes } from '@/app/routes';
+import { Footer } from '@/components/footer/Footer';
+import GradientHero from '@/components/hero/GradientHero';
+import { Navbar } from '@/components/nav/Navbar';
+import { findWorkBySlug, WORKS } from '@/data/works';
+import { useHeaderOffset } from '@/hooks/useHeaderOffset';
 
 const PortfolioPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -19,7 +20,9 @@ const PortfolioPage: React.FC = () => {
           <div>
             <h1 className="text-4xl font-bold">Proyecto no encontrado</h1>
             <p className="mt-4 opacity-70">El proyecto solicitado no existe o fue removido.</p>
-            <Link to="/" className="mt-6 inline-block font-semibold underline">Volver al inicio</Link>
+            <Link to="/" className="mt-6 inline-block font-semibold underline">
+              Volver al inicio
+            </Link>
           </div>
         </main>
         <Footer />
@@ -27,6 +30,7 @@ const PortfolioPage: React.FC = () => {
     );
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const headerOffset = useHeaderOffset();
 
   return (
@@ -52,8 +56,15 @@ const PortfolioPage: React.FC = () => {
             {/* Galería ampliada (≈65-70%) acercada al margen izquierdo */}
             <div className="md:col-span-7 lg:col-span-8 space-y-8 -ml-3 md:-ml-4 lg:-ml-6 xl:-ml-8">
               {work.images.map((img, idx) => (
-                <figure key={idx} className="w-full overflow-hidden rounded-lg shadow-sm bg-white border border-black/5">
-                  <img src={img} alt={work.title + ' imagen ' + (idx+1)} className="w-full h-auto object-cover" />
+                <figure
+                  key={idx}
+                  className="w-full overflow-hidden rounded-lg shadow-sm bg-white border border-black/5"
+                >
+                  <img
+                    src={img}
+                    alt={work.title + ' imagen ' + (idx + 1)}
+                    className="w-full h-auto object-cover"
+                  />
                 </figure>
               ))}
             </div>
@@ -65,13 +76,29 @@ const PortfolioPage: React.FC = () => {
               </div>
               <div className="space-y-4">
                 {work.client && (
-                  <p className="flex justify-between border-b border-black/10 pb-2"><span className="font-medium">Cliente</span><span className="ml-6 text-right">{work.client}</span></p>
+                  <p className="flex justify-between border-b border-black/10 pb-2">
+                    <span className="font-medium">Cliente</span>
+                    <span className="ml-6 text-right">{work.client}</span>
+                  </p>
                 )}
                 {work.partner && (
-                  <p className="flex justify-between border-b border-black/10 pb-2"><span className="font-medium">Partner</span><span className="ml-6 text-right">{work.partner}</span></p>
+                  <p className="flex justify-between border-b border-black/10 pb-2">
+                    <span className="font-medium">Partner</span>
+                    <span className="ml-6 text-right">{work.partner}</span>
+                  </p>
                 )}
                 {work.website && (
-                  <p className="flex justify-between border-b border-black/10 pb-2"><span className="font-medium">Website</span><a className="ml-6 text-right underline hover:opacity-80" href={work.website} target="_blank" rel="noopener noreferrer">{work.website.replace('https://','')}</a></p>
+                  <p className="flex justify-between border-b border-black/10 pb-2">
+                    <span className="font-medium">Website</span>
+                    <a
+                      className="ml-6 text-right underline hover:opacity-80"
+                      href={work.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {work.website.replace('https://', '')}
+                    </a>
+                  </p>
                 )}
               </div>
               <div className="pt-2 flex flex-row gap-4 flex-wrap">
@@ -99,19 +126,33 @@ const PortfolioPage: React.FC = () => {
         {/* Sección final (similar al cierre mostrado) */}
         <section className="bg-white border-t border-black/10 py-16 md:py-24 px-6 md:px-12 lg:px-24">
           <div className="max-w-7xl mx-auto">
-            <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight">Proyectos relacionados</h3>
+            <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              Proyectos relacionados
+            </h3>
             <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-              {WORKS.filter(w => w.id !== work.id).slice(0,3).map(r => (
-                <Link key={r.id} to={`/trabajos/${r.slug}`} className="group block border border-black/10 rounded-lg overflow-hidden hover:shadow-md transition">
-                  <div className="aspect-video overflow-hidden bg-black/5">
-                    <img src={r.thumbnail} alt={r.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                  </div>
-                  <div className="p-4">
-                    <h4 className="font-semibold text-lg">{r.title}</h4>
-                    {r.description && <p className="mt-1 text-sm text-black/60">{r.description}</p>}
-                  </div>
-                </Link>
-              ))}
+              {WORKS.filter((w) => w.id !== work.id)
+                .slice(0, 3)
+                .map((r) => (
+                  <Link
+                    key={r.id}
+                    to={`/trabajos/${r.slug}`}
+                    className="group block border border-black/10 rounded-lg overflow-hidden hover:shadow-md transition"
+                  >
+                    <div className="aspect-video overflow-hidden bg-black/5">
+                      <img
+                        src={r.thumbnail}
+                        alt={r.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h4 className="font-semibold text-lg">{r.title}</h4>
+                      {r.description && (
+                        <p className="mt-1 text-sm text-black/60">{r.description}</p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
             </div>
           </div>
         </section>

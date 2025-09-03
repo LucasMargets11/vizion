@@ -1,13 +1,14 @@
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import React, { useMemo, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Navbar } from '@/components/nav/Navbar';
+import { Link } from 'react-router-dom';
+
+import { Footer } from '@/components/footer/Footer';
 import GradientHero from '@/components/hero/GradientHero';
-import { useHeaderOffset } from '@/hooks/useHeaderOffset';
-import { WORKS } from '@/data/works';
+import { Navbar } from '@/components/nav/Navbar';
 import ReelCard from '@/components/work/ReelCard';
 import ReelFilter, { FilterDef } from '@/components/work/ReelFilter';
-import { Footer } from '@/components/footer/Footer';
-import { Link } from 'react-router-dom';
+import { WORKS } from '@/data/works';
+import { useHeaderOffset } from '@/hooks/useHeaderOffset';
 
 const FILTERS: FilterDef[] = [
   { key: 'all', label: 'TODO' },
@@ -22,7 +23,7 @@ const PortfolioPortal: React.FC = () => {
 
   const filtered = useMemo(() => {
     if (filter === 'all') return WORKS;
-    return WORKS.filter(w => w.categories.includes(filter));
+    return WORKS.filter((w) => w.categories.includes(filter));
   }, [filter]);
 
   return (
@@ -41,21 +42,37 @@ const PortfolioPortal: React.FC = () => {
             <ReelFilter value={filter} onChange={setFilter} filters={FILTERS} />
           </div>
           <motion.div
-            variants={{ hidden: { opacity: 1 }, visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } } }}
+            variants={{
+              hidden: { opacity: 1 },
+              visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } }
+            }}
             initial="hidden"
             animate="visible"
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             <AnimatePresence mode="popLayout" initial={false}>
-              {filtered.map(w => (
+              {filtered.map((w) => (
                 <Link key={w.id + filter} to={`/trabajos/${w.slug}`} className="block">
                   <ReelCard
                     title={w.title}
                     description={w.description}
                     thumbnail={w.thumbnail}
-                    variants={prefersReduced
-                      ? { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.15 } } }
-                      : { hidden: { opacity: 0, y: 12, scale: 0.985 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.35, ease: 'easeOut' } } }}
+                    variants={
+                      prefersReduced
+                        ? {
+                            hidden: { opacity: 0 },
+                            visible: { opacity: 1, transition: { duration: 0.15 } }
+                          }
+                        : {
+                            hidden: { opacity: 0, y: 12, scale: 0.985 },
+                            visible: {
+                              opacity: 1,
+                              y: 0,
+                              scale: 1,
+                              transition: { duration: 0.35, ease: 'easeOut' }
+                            }
+                          }
+                    }
                   />
                 </Link>
               ))}
