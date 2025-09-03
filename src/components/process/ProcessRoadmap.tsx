@@ -1,12 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { motion, useInView, useReducedMotion, useMotionValue, animate } from 'framer-motion';
 import ProcessStep from './ProcessStep';
 import { STEPS } from './data';
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.03 } },
-};
+// Eliminado containerVariants: ahora cada paso se revela solo por opacidad según progreso
 
 // Paleta base para degradés (podés moverla a tu theme)
 const STEP_COLORS = [
@@ -24,6 +21,25 @@ export default function ProcessRoadmap() {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const reduce = useReducedMotion();
+  const [introAnimating, setIntroAnimating] = useState(true);
+  const introPct = useMotionValue(0);
+  const [introPctValue, setIntroPctValue] = useState(0);
+
+  // Intro: barrido inicial que revela círculos a medida que avanza la línea
+  useEffect(() => {
+    if (reduce) {
+      setIntroAnimating(false);
+      setIntroPctValue(100);
+      return;
+    }
+    const controls = animate(introPct, 100, {
+      duration: 2.3,
+      ease: 'easeInOut',
+      onUpdate: (v) => setIntroPctValue(v),
+      onComplete: () => setIntroAnimating(false),
+    });
+    return () => controls.stop();
+  }, [reduce, introPct]);
 
   // Índice activo (por scroll)
   const activeIndex = useMemo(
@@ -57,8 +73,8 @@ export default function ProcessRoadmap() {
   }, [progressIndex]);
 
   // Timings armonizados
-  const DURATION = reduce ? 0.2 : 0.55;
-  const GLOW_DURATION = reduce ? 0.15 : 0.6;
+  const DURATION = reduce ? 0.5 : 1.2; // barra progreso más lenta
+  const GLOW_DURATION = reduce ? 0.4 : 1.1; // glow acompaña
   const EASE = 'easeOut';
 
   return (
@@ -73,15 +89,8 @@ export default function ProcessRoadmap() {
         } as React.CSSProperties
       }
     >
-      {/* Fondo sutil para profundidad */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.035]"
-        style={{
-          background:
-            'radial-gradient(1200px 500px at 50% -10%, #000 0%, transparent 60%)',
-        }}
-        aria-hidden="true"
-      />
+      
+      /
 
       {/* Keyframes locales */}
       <style>{`
@@ -122,15 +131,26 @@ export default function ProcessRoadmap() {
             />
           )}
 
-          {/* Progreso hasta el paso (hover o activo) con gradiente dinámico */}
-          <motion.div
-            className="absolute left-0 top-5 h-[3px] rounded-full shadow-[0_0_18px_rgba(0,0,0,0.08)]"
-            style={{ background: dynamicGradient }}
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPct}%` }}
-            transition={{ ease: EASE, duration: DURATION }}
-            aria-hidden="true"
-          />
+          {/* Línea de progreso: durante intro barre completo, luego sigue al activo/hover */}
+          {introAnimating ? (
+            <motion.div
+              className="absolute left-0 top-5 h-[3px] rounded-full shadow-[0_0_18px_rgba(0,0,0,0.08)]"
+              style={{ background: H_GRADIENT_BASE }}
+              initial={{ width: 0 }}
+              animate={{ width: `${introPctValue}%` }}
+              transition={{ ease: 'linear', duration: 0 }}
+              aria-hidden="true"
+            />
+          ) : (
+            <motion.div
+              className="absolute left-0 top-5 h-[3px] rounded-full shadow-[0_0_18px_rgba(0,0,0,0.08)]"
+              style={{ background: dynamicGradient }}
+              initial={false}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ ease: EASE, duration: DURATION }}
+              aria-hidden="true"
+            />
+          )}
 
           {/* Glow focal siguiendo el paso activo (no en reduce-motion) */}
           {!reduce && (
@@ -151,10 +171,6 @@ export default function ProcessRoadmap() {
           )}
 
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
             className="grid gap-6 relative"
             style={{ gridTemplateColumns: `repeat(${STEPS.length}, minmax(0, 1fr))` }}
           >
@@ -175,6 +191,13 @@ export default function ProcessRoadmap() {
                     title={s.title}
                     desc={s.desc}
                     active={active === s.id}
+                    introPhase={introAnimating}
+                    revealed={
+                      introAnimating
+                        ? (((idx + 1) / STEPS.length) * 100) <= introPctValue
+                        : idx <= progressIndex
+                    }
+                    delay={Math.min(idx * 0.05, 0.15)}
                     onActivate={() => setActive(s.id)}
                     color={STEP_COLORS[idx % STEP_COLORS.length]}
                     nextColor={STEP_COLORS[(idx + 1) % STEP_COLORS.length]}
@@ -216,6 +239,13 @@ export default function ProcessRoadmap() {
                 title={s.title}
                 desc={s.desc}
                 active={active === s.id}
+                introPhase={introAnimating}
+                revealed={
+                  introAnimating
+                    ? (((idx + 1) / STEPS.length) * 100) <= introPctValue
+                    : idx <= progressIndex
+                }
+                delay={Math.min(idx * 0.055, 0.16)}
                 onActivate={() => setActive(s.id)}
                 color={STEP_COLORS[idx % STEP_COLORS.length]}
                 nextColor={STEP_COLORS[(idx + 1) % STEP_COLORS.length]}
